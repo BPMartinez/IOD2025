@@ -1,0 +1,71 @@
+body {
+  font-family: "Roboto", sans-serif;
+  margin: 0;
+  padding: 0;
+  line-height: 1.6;
+  background: #fafafa;
+  color: #333;
+}
+
+/* Header */
+.header {
+  background: #68B0AB;
+  color: white;
+  text-align: center;
+  padding: 40px 20px;
+}
+
+.profile-pic {
+  border-radius: 45%;  
+  width: 150px;
+  height: 150px;
+  margin-bottom: 10px;
+}
+
+/* Sections */
+section {
+  padding: 20px;
+  margin: 20px auto;
+  max-width: 800px;
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+}
+
+h1, h2, h3 {
+  margin-top: 0;
+}
+
+/* Contact */
+.contact a {
+  color: #68B0AB;
+  text-decoration: none;
+}
+.contact a:hover {
+  text-decoration: underline;
+}
+
+/* Skills with Flexbox */
+.flex-skill-row {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.skill-box {
+  flex: 1;
+  text-align: center;
+  padding: 10px;
+  background: #C8D5B9;
+  border-radius: 6px;
+  margin: 5px;
+}
+
+/* Footer */
+.footer {
+  text-align: center;
+  background: #8FC0A9;
+  padding: 15px;
+  margin-top: 40px;
+}

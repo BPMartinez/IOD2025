@@ -1,0 +1,221 @@
+/* I. Selectors */
+/* Put styles for questions 1.1, 1.2, 1.3 and 1.4 here */
+
+article {
+  margin: 20px 0;             /* vertical space between articles */
+  padding: 20px;              /* space inside the article box */
+  border: 1px solid black;    /* thin black border */
+}
+
+
+.style-me1 {
+  color: red;
+}
+
+#style-me2 {
+  color: blue;
+}
+
+.style-me1#style-me2 {
+  color: purple;
+}
+
+/* Put styles for questions 2.1 and 2.2 here */
+
+.my-descendants-are-styled p {
+  background: red;
+}
+
+
+.my-children-are-styled > p {
+  background: lightgreen;
+}
+
+
+/* II. Box model and common properties */
+/* Put styles for questions 1-8 here */
+.box {
+  background-color: lightblue; 
+  margin: 20px;
+  padding: 20px;
+}
+
+/* 4-value syntax: top, right, bottom, left */
+.box.margin-padding-4 {
+  margin: 20px 40px 60px 80px;
+  padding: 10px 20px 30px 40px;
+}
+
+/* 2-value syntax: top/bottom, left/right */
+.box.margin-padding-2 {
+  margin: 20px 40px;
+  padding: 10px 30px;
+}
+
+/* 1-value syntax: applies to all sides */
+.box.margin-padding-1 {
+  margin: 50px;
+  padding: 15px;
+}
+.box.px-size {
+  width: 300px;
+  height: 150px;
+}
+
+.box.rem-size {
+  width: 20rem;
+  height: 10rem;
+}
+
+.box.vw-vh-size {
+  width: 50vw;   /* 50% of viewport width */
+  height: 20vh;  /* 20% of viewport height */
+}
+
+/* Override inline styles with !important */
+.box.force-size {
+  width: 200px !important;
+  height: 200px !important;
+}
+.box.border-solid {
+  border: 10px solid red;
+}
+
+.box.border-dashed {
+  border: 10px dashed green;
+}
+
+.box.border-double {
+  border: 10px double blue;
+}
+.box.content-box {
+  box-sizing: content-box; /* default: width/height exclude padding+border */
+}
+
+.box.border-box {
+  box-sizing: border-box;  /* width/height include padding+border */
+}
+.box.overflow-test {
+  width: 150px;
+  height: 50px;
+  overflow: visible; /* try hidden, scroll, auto */
+}
+.box.outline-test {
+  outline: 10px solid orange;
+}
+.box.rounded {
+  border-radius: 20px;
+  padding: 30px;
+}
+
+.box.circle {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  text-align: center;
+  line-height: 150px; 
+}
+.box.background-img {
+  background: url('https://export-download.canva.com/IyH7U/DAG0prIyH7U/2/0/0001-3140614941178223042.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAQYCGKMUH5AO7UJ26%2F20251002%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20251002T091021Z&X-Amz-Expires=26993&X-Amz-Signature=1ed0cc87483656c5617eff9d535fc9e34f8631842726458260d2214681f04166&X-Amz-SignedHeaders=host&response-content-disposition=attachment%3B%20filename%2A%3DUTF-8%27%27Untitled%2520design.jpg&response-expires=Thu%2C%2002%20Oct%202025%2016%3A40%3A14%20GMT') no-repeat center;
+  background-size: cover; 
+}
+
+
+
+/* III. Positioning */
+/* Put styles for questions 1-3 here */
+.position-absolute {
+  position: absolute;
+  top: 0;              
+  left: 20px;          
+  background-color: lightcoral; 
+  padding: 5px;
+}
+.position-relative {
+  position: relative;        
+  background-color: lightyellow;
+  padding: 20px;
+  margin-bottom: 40px;
+}
+
+
+
+/* IV. Styling text */
+/* Put styles for questions 1-10 here */
+.text-style {
+  /* Font color */
+  color: darkblue;   /* try other values: red, #ff6600, rgb(0, 128, 0) */
+
+  /* Font size */
+  font-size: 18px;   /* try px, em, rem, % (e.g. 1.5em, 120%) */
+
+  /* Line height */
+  line-height: 1.6;  /* unitless multiplier */
+  /* try: line-height: 24px;  or  line-height: 150%; */
+
+  /* Font weight */
+  font-weight: bold;  /* try keyword normal/bold OR number values: 400, 700, 800 */
+}
+
+
+/* V. Styling links */
+/* Put styles for questions 1-3 here */
+
+body {
+  font-family: "Roboto Condensed", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+}
+
+/* VI. calc() */
+/* Put styles for questions 1-3 here */
+
+.calc-style {
+  width: 100vw;                 /* full viewport width */
+  background-color: lightcoral; /* make the boundaries visible */
+  margin: 20px 0;
+  padding: 20px;
+}
+
+/* Then refine with calc() */
+.calc-style {
+  width: calc(100vw - 100px);   /* viewport width minus 100px */
+}
+.fixed-width-col {
+  width: 350px;
+  display: inline-block;
+  vertical-align: top;
+  background: lightblue;  /* so you can see it */
+  padding: 10px;
+}
+.fluid-col {
+  display: inline-block;
+  vertical-align: top;
+  width: calc(100% - 350px);  /* take remaining space */
+  background: lightgreen;     /* highlight */
+  padding: 10px;
+}
+.calc-style {
+  width: calc(100vw - 100px);   /* viewport width minus 100px */
+  background-color: lightcoral;
+  margin: 20px 0;
+  padding: 20px;
+}
+
+.fixed-width-col {
+  width: 350px;
+  display: inline-block;
+  vertical-align: top;
+  background: lightblue;
+  padding: 10px;
+}
+
+.fluid-col {
+  display: inline-block;
+  vertical-align: top;
+  width: calc(100% - 350px);
+  background: lightgreen;
+  padding: 10px;
+}
+
