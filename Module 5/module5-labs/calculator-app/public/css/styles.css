@@ -1,0 +1,80 @@
+body {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: #f5f7fb;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.calculator-container {
+  background: #ffffff;
+  margin-top: 40px;
+  padding: 24px 28px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  max-width: 420px;
+  width: 100%;
+}
+
+h1 {
+  text-align: center;
+  margin-top: 0;
+  margin-bottom: 24px;
+  color: #333;
+}
+
+.calc-form, .extra-box {
+  margin-bottom: 20px;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 12px;
+}
+
+label {
+  font-size: 0.9rem;
+  margin-bottom: 4px;
+  color: #555;
+}
+
+input, select {
+  padding: 8px 10px;
+  border-radius: 6px;
+  border: 1px solid #ccd2e0;
+  font-size: 1rem;
+}
+
+button {
+  width: 100%;
+  padding: 10px 0;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  background: #7c5cff;
+  color: white;
+  margin-top: 8px;
+}
+
+button:hover {
+  background: #6845e0;
+}
+
+.result-box, .extra-box {
+  border-top: 1px solid #e2e4ef;
+  padding-top: 16px;
+}
+
+.result-box h2, .extra-box h2 {
+  margin: 0 0 8px;
+}
+
+#resultText, #randomResult {
+  margin: 0;
+  color: #222;
+}
