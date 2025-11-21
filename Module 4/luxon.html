@@ -1,0 +1,32 @@
+<html>
+<head>
+<title>Luxon DateTime Formatting</title>
+<script
+src="https://cdn.jsdelivr.net/npm/luxon@3.5.0/build/global/lu
+xon.min.js"></script> <!-- reference Luxon library -->
+</head>
+<body>
+<h2>Luxon Date</h2>
+<!-- container for Luxon output -->
+<div id="displayLuxon"></div>
+<script type="text/javascript">
+(function() {
+// create a shortcut and a new Luxon date
+const DateTime = luxon.DateTime;
+let nowLuxon = DateTime.now();
+let eDisplayLuxon =
+document.getElementById('displayLuxon');
+eDisplayLuxon.innerHTML = `<p>Unformatted date:
+${nowLuxon}</p>`;
+let formatted = nowLuxon.toFormat('MMMM dd, yyyy');
+eDisplayLuxon.innerHTML += `<p>Formatted date:
+${formatted}</p>`;
+let newYork =
+nowLuxon.setZone('America/New_York').toLocaleString(DateTime.
+DATETIME_FULL);
+eDisplayLuxon.innerHTML += `<p>New York date:
+${newYork}</p>`;
+})();
+</script>
+</body>
+</html>

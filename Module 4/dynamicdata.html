@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<template id="car-template">
+<div class="card col-8" style="width: 18rem; margin:10px">
+<div class="card-body">
+<h5 class="card-title">Car title</h5>
+<p class="card-text">Car text.</p>
+</div>
+</div>
+</template>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link
+href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min
+.css" rel="stylesheet">
+<title>Dynamic Cars</title>
+</head>
+<body>
+<div id="car-list" class="row"></div>
+<script>
+// use carData and getCars function from previous slide
+// clone, then populate, then append a new template
+function addCard(car) {
+
+const template = document.getElementById("car-
+template").content.cloneNode(true);
+
+template.querySelector('.card-title').innerText = car.title;
+template.querySelector('.card-text').innerText = car.description;
+document.querySelector('#car-list').appendChild(template);
+}
+// get data asynchronously, then use it to populate a template
+getCars().then( (cars) => cars.forEach(car => addCard(car)) )
+</script>
+</body>
+</html>`
