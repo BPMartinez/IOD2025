@@ -1,0 +1,460 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Request Playdate / Carpool</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f7f7f7;
+      margin: 0;
+      padding: 0;
+    }
+
+    header {
+      background: #4CAF50;
+      color: white;
+      padding: 15px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 20px;
+    }
+
+    header .user-info {
+      font-size: 13px;
+      text-align: right;
+    }
+
+    header .user-info div {
+      margin: 2px 0;
+    }
+
+    header button {
+      margin-top: 5px;
+      padding: 5px 8px;
+      font-size: 12px;
+      border: none;
+      border-radius: 4px;
+      background: #d9534f;
+      color: white;
+      cursor: pointer;
+    }
+
+    main {
+      max-width: 900px;
+      margin: 20px auto;
+      padding: 0 15px 30px;
+    }
+
+    .top-buttons {
+      margin-bottom: 20px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .top-buttons button {
+      padding: 8px 12px;
+      border-radius: 4px;
+      border: none;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .btn-primary {
+      background: #0275d8;
+      color: white;
+    }
+
+    .btn-secondary {
+      background: #5bc0de;
+      color: white;
+    }
+
+    .btn-light {
+      background: #ffffff;
+      color: #333;
+      border: 1px solid #ccc;
+    }
+
+    .page-layout {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+
+    .column {
+      flex: 1 1 280px;
+      background: white;
+      border-radius: 8px;
+      padding: 15px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+
+    h2 {
+      margin-top: 0;
+      font-size: 18px;
+      margin-bottom: 8px;
+    }
+
+    .small-text {
+      font-size: 12px;
+      color: #555;
+      margin-bottom: 10px;
+    }
+
+    label {
+      display: block;
+      margin-top: 10px;
+      font-weight: bold;
+      font-size: 14px;
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      padding: 8px;
+      margin-top: 4px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+      font-size: 13px;
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 70px;
+    }
+
+    button.submit-btn {
+      margin-top: 15px;
+      padding: 10px 14px;
+      border: none;
+      border-radius: 4px;
+      background: #4CAF50;
+      color: white;
+      font-size: 15px;
+      cursor: pointer;
+    }
+
+    ul.connections-list {
+      list-style: none;
+      padding-left: 0;
+      font-size: 14px;
+    }
+
+    ul.connections-list li {
+      padding: 4px 0;
+      border-bottom: 1px solid #eee;
+    }
+
+    .notice {
+      font-size: 12px;
+      color: #a94442;
+      margin-top: 6px;
+    }
+
+    @media (max-width: 700px) {
+      header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      header .user-info {
+        text-align: left;
+        margin-top: 8px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Request Playdate / Carpool</h1>
+    <div class="user-info">
+      <div id="userFamilyName"></div>
+      <div id="userEmail"></div>
+      <div id="userSchoolCode"></div>
+      <button id="logoutBtn">Log Out</button>
+    </div>
+  </header>
+
+  <main>
+    <div class="top-buttons">
+      <button class="btn-light" id="goHomeBtn">← Back to Home</button>
+      <button class="btn-secondary" id="goToRequestsBtn">View My Requests</button>
+    </div>
+
+    <div class="page-layout">
+      <!-- Left column: choose connection + see connections -->
+      <section class="column">
+        <h2>Choose Family</h2>
+        <p class="small-text">
+          Select which connected family you want to send this request to.
+        </p>
+
+        <label for="toFamily">Send Request To</label>
+        <select id="toFamily" required>
+          <option value="">Select a connected family</option>
+          <!-- options filled by JS -->
+        </select>
+        <p class="notice" id="noConnectionsNotice" style="display:none;">
+          You don’t have any connections yet. Ask other parents at your school to use the same
+          school / group code when they sign up.
+        </p>
+
+        <h3 style="margin-top:16px; font-size:16px;">My Connections</h3>
+        <p class="small-text">
+          These are families linked to you by your school / group code.
+        </p>
+        <ul id="connectionsList" class="connections-list"></ul>
+      </section>
+
+      <!-- Right column: request form -->
+      <section class="column">
+        <h2>Request Details</h2>
+        <p class="small-text">
+          Fill out this form to request a playdate or after-school carpool pickup.
+        </p>
+
+        <form id="requestForm">
+          <label for="childName">Child's Name</label>
+          <input type="text" id="childName" required />
+
+          <label for="parentName">Parent / Guardian Name</label>
+          <input type="text" id="parentName" required />
+
+          <label for="phone">Phone Number</label>
+          <input type="tel" id="phone" required placeholder="555-123-4567" />
+
+          <label for="email">Contact Email</label>
+          <input type="email" id="email" required />
+
+          <label for="purpose">Purpose</label>
+          <select id="purpose" required>
+            <option value="">Select one</option>
+            <option value="playdate">Playdate</option>
+            <option value="carpool">After-school Carpool Pickup</option>
+            <option value="both">Both</option>
+          </select>
+
+          <label for="date">Preferred Date</label>
+          <input type="date" id="date" />
+
+          <label for="time">Preferred Time</label>
+          <input type="time" id="time" />
+
+          <label for="notes">Additional Notes</label>
+          <textarea
+            id="notes"
+            placeholder="Allergies, pickup instructions, siblings attending, etc."
+          ></textarea>
+
+          <label for="photo">Upload Family / Child Photo (optional)</label>
+          <input type="file" id="photo" accept="image/*" />
+
+          <button type="submit" class="submit-btn">Send Request</button>
+        </form>
+      </section>
+    </div>
+  </main>
+
+ <script>
+  (function () {
+    const API_BASE_URL = "http://localhost:5000/api";
+
+    function getToken() {
+      return localStorage.getItem("authToken");
+    }
+
+    function getCurrentUserFromStorage() {
+      const raw = localStorage.getItem("currentUser");
+      if (!raw) return null;
+      try {
+        return JSON.parse(raw);
+      } catch {
+        return null;
+      }
+    }
+
+    function ensureLoggedIn() {
+      const user = getCurrentUserFromStorage();
+      const token = getToken();
+      if (!user || !token) {
+        alert("Please log in first.");
+        window.location.href = "auth.html";
+        return null;
+      }
+      return { user, token };
+    }
+
+    const auth = ensureLoggedIn();
+    if (!auth) return;
+    const { user, token } = auth;
+    const currentUser = user;
+
+    // ===== Fill header with user info =====
+    document.getElementById("userFamilyName").textContent =
+      currentUser.familyName || "Family";
+    document.getElementById("userEmail").textContent =
+      "Email: " + (currentUser.email || "");
+    document.getElementById("userSchoolCode").textContent =
+      "School / Group Code: " + (currentUser.schoolCode || "N/A");
+
+    // ===== Navigation & logout =====
+    document.getElementById("logoutBtn").addEventListener("click", () => {
+      localStorage.removeItem("authToken");
+      localStorage.removeItem("currentUser");
+      localStorage.removeItem("currentUserEmail");
+      window.location.href = "auth.html";
+    });
+
+    document.getElementById("goHomeBtn").addEventListener("click", () => {
+      window.location.href = "home.html";
+    });
+
+    document.getElementById("goToRequestsBtn").addEventListener("click", () => {
+      window.location.href = "contact.html";
+    });
+
+    // ===== Populate connections & "Send To" dropdown (still using local demo users) =====
+    const toFamilySelect = document.getElementById("toFamily");
+    const connectionsListEl = document.getElementById("connectionsList");
+    const noConnectionsNotice = document.getElementById("noConnectionsNotice");
+
+    function getUsersLocal() {
+      return JSON.parse(localStorage.getItem("users")) || [];
+    }
+
+    function renderConnections() {
+      const users = getUsersLocal();
+      connectionsListEl.innerHTML = "";
+      toFamilySelect.innerHTML =
+        '<option value="">Select a connected family</option>';
+
+      const connections = Array.isArray(currentUser.connections)
+        ? currentUser.connections
+        : [];
+
+      if (connections.length === 0) {
+        noConnectionsNotice.style.display = "block";
+        connectionsListEl.innerHTML =
+          "<li>No connections yet. Share your school / group code with other parents.</li>";
+        return;
+      }
+
+      noConnectionsNotice.style.display = "none";
+
+      connections.forEach(email => {
+        const otherUser = users.find(u => u.email === email);
+        const label = otherUser
+          ? `${otherUser.familyName || "Family"} — ${otherUser.email}`
+          : email;
+
+        const option = document.createElement("option");
+        option.value = email;
+        option.textContent = label;
+        toFamilySelect.appendChild(option);
+
+        const li = document.createElement("li");
+        li.textContent = label;
+        connectionsListEl.appendChild(li);
+      });
+    }
+
+    renderConnections();
+
+    // ===== Handle form submission (send to backend) =====
+    const requestForm = document.getElementById("requestForm");
+
+    function mapPurpose(value) {
+      if (value === "playdate") return "Playdate";
+      if (value === "carpool") return "Carpool";
+      return "Other";
+    }
+
+    async function sendRequestToServer(body) {
+      const res = await fetch(`${API_BASE_URL}/requests`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify(body)
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(data.message || "Could not send request");
+      }
+      return data;
+    }
+
+    requestForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+
+      if (!toFamilySelect.value) {
+        alert("Please choose a family to send this request to.");
+        return;
+      }
+
+      const childName = document.getElementById("childName").value;
+      const parentName = document.getElementById("parentName").value;
+      const phone = document.getElementById("phone").value;
+      const contactEmail = document.getElementById("email").value;
+      const purposeRaw = document.getElementById("purpose").value;
+      const date = document.getElementById("date").value;
+      const time = document.getElementById("time").value;
+      const notes = document.getElementById("notes").value;
+
+      const fileInput = document.getElementById("photo");
+      const file = fileInput && fileInput.files ? fileInput.files[0] : null;
+
+      function doSend(photoUrl) {
+        const body = {
+          toEmail: toFamilySelect.value,
+          childName,
+          parentName,
+          phone,
+          email: contactEmail,
+          purpose: mapPurpose(purposeRaw),
+          date,
+          time,
+          notes,
+          photoUrl: photoUrl || ""
+        };
+
+        sendRequestToServer(body)
+          .then(() => {
+            alert("Request sent!");
+            requestForm.reset();
+            toFamilySelect.selectedIndex = 0;
+          })
+          .catch(err => {
+            console.error(err);
+            alert(err.message || "There was a problem sending your request.");
+          });
+      }
+
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function (event) {
+          const photoDataUrl = event.target.result;
+          doSend(photoDataUrl);
+        };
+        reader.readAsDataURL(file);
+      } else {
+        doSend("");
+      }
+    });
+  })();
+</script>
+
+
+</body>
+</html> -->

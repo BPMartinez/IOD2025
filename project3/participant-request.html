@@ -1,0 +1,438 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Requests Sent To Me</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f7f7f7;
+      margin: 0;
+      padding: 0;
+    }
+
+    header {
+      background: #4CAF50;
+      color: white;
+      padding: 15px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 20px;
+    }
+
+    header .user-info {
+      font-size: 13px;
+      text-align: right;
+    }
+
+    header .user-info div {
+      margin: 2px 0;
+    }
+
+    header button {
+      margin-top: 5px;
+      padding: 5px 8px;
+      font-size: 12px;
+      border: none;
+      border-radius: 4px;
+      background: #d9534f;
+      color: white;
+      cursor: pointer;
+    }
+
+    main {
+      max-width: 900px;
+      margin: 20px auto;
+      padding: 0 15px 30px;
+    }
+
+    .top-buttons {
+      margin-bottom: 20px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .top-buttons button {
+      padding: 8px 12px;
+      border-radius: 4px;
+      border: none;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .btn-light {
+      background: #ffffff;
+      color: #333;
+      border: 1px solid #ccc;
+    }
+
+    .btn-secondary {
+      background: #5bc0de;
+      color: white;
+    }
+
+    .request-card {
+      background: white;
+      border-radius: 8px;
+      padding: 15px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      margin-bottom: 15px;
+      display: flex;
+      gap: 15px;
+      flex-wrap: wrap;
+    }
+
+    .request-photo {
+      max-width: 100px;
+      max-height: 100px;
+      object-fit: cover;
+      border-radius: 6px;
+      border: 1px solid #ddd;
+    }
+
+    .request-details {
+      flex: 1 1 220px;
+      font-size: 14px;
+    }
+
+    .request-details h2 {
+      margin: 0 0 6px 0;
+      font-size: 16px;
+    }
+
+    .field-label {
+      font-weight: bold;
+      margin-top: 6px;
+      display: block;
+      font-size: 13px;
+    }
+
+    .field-value {
+      margin-top: 2px;
+      font-size: 13px;
+    }
+
+    .status-row {
+      margin-top: 10px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .status-badge {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 999px;
+      font-size: 11px;
+      color: #fff;
+    }
+
+    .status-pending {
+      background: #f0ad4e;
+    }
+    .status-accepted {
+      background: #5cb85c;
+    }
+    .status-declined {
+      background: #d9534f;
+    }
+
+    .status-buttons button {
+      padding: 6px 10px;
+      border-radius: 4px;
+      border: none;
+      font-size: 12px;
+      cursor: pointer;
+    }
+
+    .btn-accept {
+      background: #5cb85c;
+      color: #fff;
+    }
+
+    .btn-decline {
+      background: #d9534f;
+      color: #fff;
+    }
+
+    .no-requests {
+      font-size: 14px;
+      color: #666;
+      margin-top: 15px;
+    }
+
+    @media (max-width: 700px) {
+      header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      header .user-info {
+        text-align: left;
+        margin-top: 8px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Requests Sent To Me</h1>
+    <div class="user-info">
+      <div id="userFamilyName"></div>
+      <div id="userEmail"></div>
+      <div id="userSchoolCode"></div>
+      <button id="logoutBtn">Log Out</button>
+    </div>
+  </header>
+
+  <main>
+    <div class="top-buttons">
+      <button class="btn-light" id="goHomeBtn">← Back to Home</button>
+      <button class="btn-secondary" id="goToRequestsBtn">View All My Requests</button>
+    </div>
+
+    <div id="requestsContainer"></div>
+    <p id="noRequestsMessage" class="no-requests" style="display:none;">
+      You don’t have any requests sent to you yet.
+    </p>
+  </main>
+
+  <script>
+  (function () {
+    const API_BASE_URL = "http://localhost:5000/api";
+
+    function getToken() {
+      return localStorage.getItem("authToken");
+    }
+
+    function getCurrentUserFromStorage() {
+      const raw = localStorage.getItem("currentUser");
+      if (!raw) return null;
+      try {
+        return JSON.parse(raw);
+      } catch {
+        return null;
+      }
+    }
+
+    function ensureLoggedIn() {
+      const user = getCurrentUserFromStorage();
+      const token = getToken();
+      if (!user || !token) {
+        alert("Please log in first.");
+        window.location.href = "auth.html";
+        return null;
+      }
+      return { user, token };
+    }
+
+    const auth = ensureLoggedIn();
+    if (!auth) return;
+    const { user, token } = auth;
+
+    // Header info
+    document.getElementById("userFamilyName").textContent =
+      user.familyName || "Family";
+    document.getElementById("userEmail").textContent =
+      "Email: " + (user.email || "");
+    document.getElementById("userSchoolCode").textContent =
+      "School / Group Code: " + (user.schoolCode || "N/A");
+
+    // Nav buttons
+    document.getElementById("logoutBtn").addEventListener("click", () => {
+      localStorage.removeItem("authToken");
+      localStorage.removeItem("currentUser");
+      localStorage.removeItem("currentUserEmail");
+      window.location.href = "auth.html";
+    });
+
+    document.getElementById("goHomeBtn").addEventListener("click", () => {
+      window.location.href = "home.html";
+    });
+
+    document.getElementById("goToRequestsBtn").addEventListener("click", () => {
+      window.location.href = "contact.html";
+    });
+
+    const container = document.getElementById("requestsContainer");
+    const noRequestsMessage = document.getElementById("noRequestsMessage");
+
+    async function fetchInboundRequests() {
+      const res = await fetch(`${API_BASE_URL}/requests/inbound`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      const data = await res.json().catch(() => ([]));
+      if (!res.ok) {
+        throw new Error(data.message || "Could not load inbound requests");
+      }
+      return data;
+    }
+
+    async function updateStatus(id, status) {
+      try {
+        const res = await fetch(`${API_BASE_URL}/requests/${id}/status`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`
+          },
+          body: JSON.stringify({ status })
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) {
+          throw new Error(data.message || "Could not update status");
+        }
+      } catch (err) {
+        console.error(err);
+        alert("Could not update request status.");
+      }
+    }
+
+    function makeStatusBadge(status) {
+      const span = document.createElement("span");
+      span.classList.add("status-badge");
+      if (status === "accepted") {
+        span.classList.add("status-accepted");
+      } else if (status === "declined") {
+        span.classList.add("status-declined");
+      } else {
+        span.classList.add("status-pending");
+      }
+      span.textContent = status.charAt(0).toUpperCase() + status.slice(1);
+      return span;
+    }
+
+    function renderRequests(requests) {
+      container.innerHTML = "";
+
+      if (!requests.length) {
+        noRequestsMessage.style.display = "block";
+        return;
+      }
+
+      noRequestsMessage.style.display = "none";
+
+      requests.forEach(req => {
+        const card = document.createElement("div");
+        card.className = "request-card";
+
+        // Photo
+        let photoEl;
+        if (req.photoUrl) {
+          photoEl = document.createElement("img");
+          photoEl.className = "request-photo";
+          photoEl.src = req.photoUrl;
+          photoEl.alt = "Family photo";
+        } else {
+          photoEl = document.createElement("div");
+          photoEl.textContent = "No photo";
+        }
+
+        // Details
+        const details = document.createElement("div");
+        details.className = "request-details";
+
+        const title = document.createElement("h2");
+        title.textContent = req.childName || "Request";
+
+        const makeField = (label, value) => {
+          const labelEl = document.createElement("span");
+          labelEl.className = "field-label";
+          labelEl.textContent = label;
+
+          const valueEl = document.createElement("div");
+          valueEl.className = "field-value";
+          valueEl.textContent = value || "";
+
+          details.appendChild(labelEl);
+          details.appendChild(valueEl);
+        };
+
+        details.appendChild(title);
+
+        makeField("Parent / Guardian", req.parentName);
+        makeField("Phone", req.phone);
+        makeField("Email", req.email);
+        makeField("Purpose", req.purpose);
+        makeField("Date", req.date);
+        makeField("Time", req.time);
+        makeField("Notes", req.notes);
+
+        const fromEmail = req.fromUser && req.fromUser.email ? req.fromUser.email : "";
+        makeField("From", fromEmail);
+
+        // Status row
+        const statusRow = document.createElement("div");
+        statusRow.className = "status-row";
+
+        const badge = makeStatusBadge(req.status || "pending");
+        badge.dataset.id = req._id;
+
+        const buttonsWrapper = document.createElement("div");
+        buttonsWrapper.className = "status-buttons";
+
+        const btnAccept = document.createElement("button");
+        btnAccept.className = "btn-accept";
+        btnAccept.textContent = "Accept";
+
+        const btnDecline = document.createElement("button");
+        btnDecline.className = "btn-decline";
+        btnDecline.textContent = "Decline";
+
+        btnAccept.addEventListener("click", async () => {
+          await updateStatus(req._id, "accepted");
+          badge.className = "status-badge status-accepted";
+          badge.textContent = "Accepted";
+        });
+
+        btnDecline.addEventListener("click", async () => {
+          await updateStatus(req._id, "declined");
+          badge.className = "status-badge status-declined";
+          badge.textContent = "Declined";
+        });
+
+        buttonsWrapper.appendChild(btnAccept);
+        buttonsWrapper.appendChild(btnDecline);
+
+        statusRow.appendChild(badge);
+        statusRow.appendChild(buttonsWrapper);
+
+        details.appendChild(statusRow);
+
+        card.appendChild(photoEl);
+        card.appendChild(details);
+
+        container.appendChild(card);
+      });
+    }
+
+    async function init() {
+      try {
+        const requests = await fetchInboundRequests();
+        renderRequests(requests);
+      } catch (err) {
+        console.error(err);
+        noRequestsMessage.style.display = "block";
+        noRequestsMessage.textContent =
+          "Could not load requests sent to you. Is the server running?";
+      }
+    }
+
+    init();
+  })();
+</script>
+
+
+</body>
+</html> -->

@@ -1,0 +1,309 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Family Login - Playdate App</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f7f7f7;
+      padding: 20px;
+    }
+    .container {
+      max-width: 400px;
+      margin: auto;
+      background: #fff;
+      padding: 20px 25px;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    h2 {
+      text-align: center;
+      margin-bottom: 10px;
+    }
+    p.helper-text {
+      font-size: 13px;
+      color: #555;
+      margin-top: 0;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+    label {
+      display: block;
+      margin-top: 10px;
+      font-weight: bold;
+    }
+    input {
+      width: 100%;
+      padding: 8px;
+      margin-top: 4px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+    }
+    button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 15px;
+      border: none;
+      border-radius: 6px;
+      font-size: 15px;
+      cursor: pointer;
+    }
+    .btn-primary {
+      background: #4CAF50;
+      color: white;
+    }
+    .btn-secondary {
+      background: #555;
+      color: white;
+    }
+    .switch {
+      text-align: center;
+      margin-top: 10px;
+      font-size: 14px;
+    }
+    .switch a {
+      color: #4CAF50;
+      cursor: pointer;
+    }
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h2 id="formTitle">Family Sign Up</h2>
+    <p class="helper-text" id="helperText">
+      Use the same school / group code as other families at your child’s school
+      to be automatically connected.
+      <br />
+      Example: <strong>OAKHILL-ELEM-2025</strong>
+    </p>
+
+    <!-- Sign Up Form -->
+    <form id="signupForm">
+      <label for="signupFamilyName">Family Name</label>
+      <input type="text" id="signupFamilyName" required placeholder="e.g. Martinez Family" />
+
+      <label for="signupEmail">Email</label>
+      <input type="email" id="signupEmail" required />
+
+      <label for="signupPassword">Password</label>
+      <input type="password" id="signupPassword" required />
+
+      <!-- NEW: School / Group Code -->
+      <label for="signupSchoolCode">School / Group Code</label>
+      <input
+        type="text"
+        id="signupSchoolCode"
+        required
+        placeholder="e.g. OAKHILL-ELEM-2025"
+      />
+
+      <button type="submit" class="btn-primary">Sign Up</button>
+    </form>
+
+    <!-- Login Form -->
+    <form id="loginForm" class="hidden">
+      <label for="loginEmail">Email</label>
+      <input type="email" id="loginEmail" required />
+
+      <label for="loginPassword">Password</label>
+      <input type="password" id="loginPassword" required />
+
+      <button type="submit" class="btn-secondary">Log In</button>
+    </form>
+
+    <div class="switch">
+      <span id="switchText">
+        Already have an account?
+        <a id="switchLink">Log in</a>
+      </span>
+    </div>
+  </div>
+
+  <script>
+  // === API base ===
+  const API_BASE_URL = "http://localhost:5000/api";
+
+  // === Local helpers (keep for connections demo) ===
+  function getUsers() {
+    return JSON.parse(localStorage.getItem("users")) || [];
+  }
+
+  function saveUsers(users) {
+    localStorage.setItem("users", JSON.stringify(users));
+  }
+
+  function setCurrentUser(email) {
+    // compatibility with other pages that still read this
+    localStorage.setItem("currentUserEmail", email);
+  }
+
+  function saveAuth(token, user) {
+    if (!token || !user) return;
+    localStorage.setItem("authToken", token);
+    localStorage.setItem("currentUser", JSON.stringify(user));
+    localStorage.setItem("currentUserEmail", user.email || "");
+  }
+
+  // ==== Toggle between Sign Up / Login ====
+  const signupForm = document.getElementById("signupForm");
+  const loginForm = document.getElementById("loginForm");
+  const formTitle = document.getElementById("formTitle");
+  const switchText = document.getElementById("switchText");
+  const helperText = document.getElementById("helperText");
+
+  let mode = "signup"; // or "login"
+
+  function attachSwitchLinkHandler() {
+    const dynamicLink = document.getElementById("switchLink");
+    if (!dynamicLink) return;
+    dynamicLink.addEventListener("click", () => {
+      if (mode === "signup") {
+        // switch to login
+        mode = "login";
+        signupForm.classList.add("hidden");
+        loginForm.classList.remove("hidden");
+        formTitle.textContent = "Family Login";
+        helperText.textContent = "";
+        switchText.innerHTML = `Need an account? <a id="switchLink">Sign up</a>`;
+      } else {
+        // switch to signup
+        mode = "signup";
+        loginForm.classList.add("hidden");
+        signupForm.classList.remove("hidden");
+        formTitle.textContent = "Family Sign Up";
+        helperText.innerHTML =
+          'Use the same school / group code as other families at your child’s school to be automatically connected.<br />Example: <strong>OAKHILL-ELEM-2025</strong>';
+        switchText.innerHTML = `Already have an account? <a id="switchLink">Log in</a>`;
+      }
+      // re-attach handler after we changed innerHTML
+      attachSwitchLinkHandler();
+    });
+  }
+
+  attachSwitchLinkHandler();
+
+  // ==== Sign Up handler (still auto-connects locally, *plus* sends to backend) ====
+  signupForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const familyName = document.getElementById("signupFamilyName").value.trim();
+    const email = document.getElementById("signupEmail").value.trim().toLowerCase();
+    const password = document.getElementById("signupPassword").value;
+    const schoolCodeRaw = document.getElementById("signupSchoolCode").value.trim();
+
+    // Normalize school code (e.g., uppercase)
+    const schoolCode = schoolCodeRaw.toUpperCase();
+
+    let users = getUsers();
+
+    if (users.find(u => u.email === email)) {
+      alert("An account with this email already exists. Please log in instead.");
+      return;
+    }
+
+    // Find existing users with same school code (for local demo connections)
+    const sameCodeUsers = users.filter(u => u.schoolCode === schoolCode);
+
+    const newUser = {
+      familyName,
+      email,
+      password,          // demo only; real apps would hash passwords
+      schoolCode,
+      connections: []    // list of other families’ emails
+    };
+
+    // Auto-connect with all families that share this code (local only)
+    sameCodeUsers.forEach(existingUser => {
+      if (!Array.isArray(existingUser.connections)) {
+        existingUser.connections = [];
+      }
+
+      // 1. add new user email to existing user's connections
+      if (!existingUser.connections.includes(email)) {
+        existingUser.connections.push(email);
+      }
+
+      // 2. add existing user email to new user's connections
+      if (!newUser.connections.includes(existingUser.email)) {
+        newUser.connections.push(existingUser.email);
+      }
+    });
+
+    // Save updated existing users + new user locally (for connections UI)
+    users = users.map(u => {
+      const match = sameCodeUsers.find(su => su.email === u.email);
+      return match ? match : u;
+    });
+    users.push(newUser);
+
+    saveUsers(users);
+    setCurrentUser(email);
+
+    // --- Send signup to backend so MongoDB has this user ---
+    try {
+      const res = await fetch(`${API_BASE_URL}/auth/signup`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ familyName, email, password, schoolCode })
+      });
+
+      const data = await res.json().catch(() => ({}));
+
+      if (!res.ok) {
+        alert(data.message || "Back-end signup failed, but local demo signup worked. You can still use the app, but check your server later.");
+      } else if (data.token && data.user) {
+        saveAuth(data.token, data.user);
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Local signup worked, but I couldn’t reach the server. Is the back-end running?");
+    }
+
+    alert("Account created! You’re now connected with other families using this code. Redirecting to home...");
+    window.location.href = "home.html";
+  });
+
+  // ==== Login handler (uses backend so we get a token) ====
+  loginForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const email = document.getElementById("loginEmail").value.trim().toLowerCase();
+    const password = document.getElementById("loginPassword").value;
+
+    try {
+      const res = await fetch(`${API_BASE_URL}/auth/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password })
+      });
+
+      const data = await res.json().catch(() => ({}));
+
+      if (!res.ok) {
+        alert(data.message || "Invalid email or password.");
+        return;
+      }
+
+      if (data.token && data.user) {
+        saveAuth(data.token, data.user);
+        setCurrentUser(data.user.email);
+        alert("Login successful! Redirecting to home...");
+        window.location.href = "home.html";
+      } else {
+        alert("Login succeeded but response was missing token/user.");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Error contacting the server. Make sure the back-end is running.");
+    }
+  });
+</script>
+
+
+</body>
+</html> -->

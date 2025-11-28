@@ -1,0 +1,346 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Playdate & Carpool Requests</title>
+<ul>
+  <button class="btn-primary" onclick="window.location.href='forms.html'">
+  Request Playdate / Carpool
+</button>
+
+<button class="btn-secondary" onclick="window.location.href='participant-request.html'">
+  View My Requests
+</button>
+
+
+<button class="btn-light" onclick="window.location.href='Home.html'">
+  Home
+</button>
+
+</ul>
+  <style>
+
+
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background: #f7f7f7;
+    }
+    h1 {
+      margin-bottom: 5px;
+    }
+    h2 {
+      margin-top: 0;
+      margin-bottom: 20px;
+      font-size: 16px;
+      color: #555;
+    }
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    .top-bar span {
+      font-size: 14px;
+      color: #555;
+    }
+    .logout-btn {
+      padding: 6px 10px;
+      font-size: 13px;
+      border: none;
+      border-radius: 4px;
+      background: #d9534f;
+      color: #fff;
+      cursor: pointer;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      border-radius: 8px;
+      overflow: hidden;
+      table-layout: fixed;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      font-size: 13px;
+      vertical-align: top;
+      word-wrap: break-word;
+    }
+    th {
+      background: #4CAF50;
+      color: white;
+      text-align: left;
+    }
+    tr:nth-child(even) {
+      background: #f2f2f2;
+    }
+
+    img.request-photo {
+      max-width: 70px;
+      max-height: 70px;
+      object-fit: cover;
+      border-radius: 6px;
+      display: block;
+      margin: 0 auto;
+    }
+
+    .playdate-comments {
+      width: 100%;
+      min-height: 60px;
+      resize: vertical;
+      font-size: 12px;
+      padding: 4px;
+    }
+    .center {
+      text-align: center;
+    }
+    .badge {
+      display: inline-block;
+      padding: 3px 6px;
+      border-radius: 999px;
+      font-size: 11px;
+      color: #fff;
+    }
+    .badge-sent {
+      background: #0275d8;
+    }
+    .badge-received {
+      background: #5cb85c;
+    }
+
+    .no-data {
+      margin-top: 20px;
+      font-size: 14px;
+      color: #666;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="top-bar">
+    <div>
+      <h1>My Requests</h1>
+      <h2>Playdates & After-school Carpool</h2>
+    </div>
+    <div>
+      <span id="currentUserLabel"></span>
+      <button class="logout-btn" id="logoutBtn">Log Out</button>
+    </div>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Photo</th>
+        <th>Child</th>
+        <th>Parent</th>
+        <th>Phone</th>
+        <th>Email</th>
+        <th>Purpose</th>
+        <th>Date</th>
+        <th>Time</th>
+        <th>Notes</th>
+        <th>From / To</th>
+        <th>Had Playdate?</th>
+        <th>Playdate Comments</th>
+      </tr>
+    </thead>
+    <tbody id="requestsTable"></tbody>
+  </table>
+
+  <p id="noDataMessage" class="no-data" style="display:none;">
+    No requests yet. Once you send or receive playdate/carpool requests with connected families, they will show up here.
+  </p>
+
+  <script>
+  (function () {
+    const API_BASE_URL = "http://localhost:5000/api";
+
+    function getToken() {
+      return localStorage.getItem("authToken");
+    }
+
+    function getCurrentUserFromStorage() {
+      const raw = localStorage.getItem("currentUser");
+      if (!raw) return null;
+      try {
+        return JSON.parse(raw);
+      } catch {
+        return null;
+      }
+    }
+
+    function ensureLoggedIn() {
+      const user = getCurrentUserFromStorage();
+      const token = getToken();
+      if (!user || !token) {
+        alert("Please log in first.");
+        window.location.href = "auth.html";
+        return null;
+      }
+      return { user, token };
+    }
+
+    const auth = ensureLoggedIn();
+    if (!auth) return;
+    const { user, token } = auth;
+
+    const tableBody = document.getElementById("requestsTable");
+    const noDataMessage = document.getElementById("noDataMessage");
+    const currentUserLabel = document.getElementById("currentUserLabel");
+
+    currentUserLabel.textContent = "Logged in as: " + (user.email || "");
+
+    // Logout
+    document.getElementById("logoutBtn").addEventListener("click", () => {
+      localStorage.removeItem("authToken");
+      localStorage.removeItem("currentUser");
+      localStorage.removeItem("currentUserEmail");
+      window.location.href = "auth.html";
+    });
+
+    async function fetchMyRequests() {
+      const res = await fetch(`${API_BASE_URL}/requests`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      const data = await res.json().catch(() => ([]));
+      if (!res.ok) {
+        throw new Error(data.message || "Could not load requests");
+      }
+      return data;
+    }
+
+    async function updatePlaydateInfo(id, hadPlaydate, comments) {
+      try {
+        await fetch(`${API_BASE_URL}/requests/${id}/playdate`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            hadPlaydate,
+            playdateComments: comments
+          })
+        });
+      } catch (err) {
+        console.error(err);
+        alert("Could not save playdate notes; please try again.");
+      }
+    }
+
+    function renderTable(requests) {
+      tableBody.innerHTML = "";
+
+      if (!requests.length) {
+        noDataMessage.style.display = "block";
+        tableBody.innerHTML =
+          "<tr><td colspan='12' class='center'>No matching requests.</td></tr>";
+        return;
+      }
+
+      noDataMessage.style.display = "none";
+
+      requests.forEach(req => {
+        const row = document.createElement("tr");
+
+        const photoCellContent = req.photoUrl
+          ? `<img class="request-photo" src="${req.photoUrl}" alt="Family photo" />`
+          : "No photo";
+
+        const isSender = req.fromUser && req.fromUser.email === user.email;
+        const directionBadge = isSender
+          ? `<span class="badge badge-sent">Sent</span>`
+          : `<span class="badge badge-received">Received</span>`;
+
+        const fromEmail = req.fromUser && req.fromUser.email ? req.fromUser.email : "";
+        const toEmail = req.toUser && req.toUser.email ? req.toUser.email : "";
+
+        const fromToText = `
+          ${directionBadge}<br/>
+          <strong>From:</strong> ${fromEmail}<br/>
+          <strong>To:</strong> ${toEmail}
+        `;
+
+        const hadPlaydate = !!req.hadPlaydate;
+        const comments = req.playdateComments || "";
+
+        row.innerHTML = `
+          <td class="center">${photoCellContent}</td>
+          <td>${req.childName || ""}</td>
+          <td>${req.parentName || ""}</td>
+          <td>${req.phone || ""}</td>
+          <td>${req.email || ""}</td>
+          <td>${req.purpose || ""}</td>
+          <td>${req.date || ""}</td>
+          <td>${req.time || ""}</td>
+          <td>${req.notes || ""}</td>
+          <td>${fromToText}</td>
+          <td class="center">
+            <input 
+              type="checkbox" 
+              class="had-playdate-checkbox" 
+              data-id="${req._id}"
+              ${hadPlaydate ? "checked" : ""}
+            />
+          </td>
+          <td>
+            <textarea 
+              class="playdate-comments" 
+              data-id="${req._id}"
+            >${comments}</textarea>
+          </td>
+        `;
+
+        tableBody.appendChild(row);
+      });
+
+      // Hook up listeners for checkboxes & comments
+      tableBody.querySelectorAll(".had-playdate-checkbox").forEach(cb => {
+        cb.addEventListener("change", () => {
+          const id = cb.dataset.id;
+          const textarea = tableBody.querySelector(
+            `.playdate-comments[data-id="${id}"]`
+          );
+          updatePlaydateInfo(id, cb.checked, textarea ? textarea.value : "");
+        });
+      });
+
+      tableBody.querySelectorAll(".playdate-comments").forEach(textarea => {
+        textarea.addEventListener("blur", () => {
+          const id = textarea.dataset.id;
+          const cb = tableBody.querySelector(
+            `.had-playdate-checkbox[data-id="${id}"]`
+          );
+          updatePlaydateInfo(id, cb ? cb.checked : false, textarea.value);
+        });
+      });
+    }
+
+    async function init() {
+      try {
+        const requests = await fetchMyRequests();
+        renderTable(requests);
+      } catch (err) {
+        console.error(err);
+        noDataMessage.style.display = "block";
+        noDataMessage.textContent =
+          "Could not load requests. Is the server running?";
+      }
+    }
+
+    init();
+  })();
+</script>
+
+
+</body>
+</html> -->

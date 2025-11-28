@@ -1,0 +1,478 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Family Home - Playdate & Carpool</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f7f7f7;
+      margin: 0;
+      padding: 0;
+    }
+
+    header {
+      background: #4CAF50;
+      color: white;
+      padding: 15px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 20px;
+    }
+
+    header .user-info {
+      font-size: 13px;
+      text-align: right;
+    }
+
+    header .user-info div {
+      margin: 2px 0;
+    }
+
+    header button {
+      margin-top: 5px;
+      padding: 5px 8px;
+      font-size: 12px;
+      border: none;
+      border-radius: 4px;
+      background: #d9534f;
+      color: white;
+      cursor: pointer;
+    }
+
+    main {
+      padding: 20px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .top-buttons {
+      margin-bottom: 20px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .top-buttons button {
+      padding: 8px 12px;
+      border-radius: 4px;
+      border: none;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .btn-primary {
+      background: #0275d8;
+      color: white;
+    }
+
+    .btn-secondary {
+      background: #5bc0de;
+      color: white;
+    }
+
+    .btn-light {
+      background: #ffffff;
+      color: #333;
+      border: 1px solid #ccc;
+    }
+
+    .columns {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+
+    .column {
+      flex: 1 1 300px;
+      background: white;
+      border-radius: 8px;
+      padding: 15px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+
+    .column h2 {
+      margin-top: 0;
+      font-size: 18px;
+      margin-bottom: 8px;
+    }
+
+    .small-text {
+      font-size: 12px;
+      color: #555;
+      margin-bottom: 10px;
+    }
+
+    ul.connections-list {
+      list-style: none;
+      padding-left: 0;
+      font-size: 14px;
+    }
+
+    ul.connections-list li {
+      padding: 4px 0;
+      border-bottom: 1px solid #eee;
+    }
+
+    .event-form label {
+      display: block;
+      margin-top: 8px;
+      font-weight: bold;
+      font-size: 14px;
+    }
+
+    .event-form input,
+    .event-form textarea {
+      width: 100%;
+      padding: 6px;
+      margin-top: 3px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+      font-size: 13px;
+    }
+
+    .event-form textarea {
+      resize: vertical;
+      min-height: 60px;
+    }
+
+    .event-form button {
+      margin-top: 10px;
+      padding: 8px 12px;
+      font-size: 14px;
+      border: none;
+      border-radius: 4px;
+      background: #4CAF50;
+      color: white;
+      cursor: pointer;
+    }
+
+    .event-card {
+      background: #ffffff;
+      border-radius: 6px;
+      padding: 10px;
+      margin-bottom: 10px;
+      border: 1px solid #e0e0e0;
+      font-size: 13px;
+    }
+
+    .event-card h3 {
+      margin: 0 0 4px 0;
+      font-size: 15px;
+    }
+
+    .event-meta {
+      font-size: 12px;
+      color: #666;
+      margin-bottom: 4px;
+    }
+
+    .event-description {
+      margin-top: 4px;
+    }
+
+    .no-events {
+      font-size: 13px;
+      color: #777;
+    }
+
+    @media (max-width: 700px) {
+      header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      header .user-info {
+        text-align: left;
+        margin-top: 8px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Family Home</h1>
+    <div class="user-info">
+      <div id="userFamilyName"></div>
+      <div id="userEmail"></div>
+      <div id="userSchoolCode"></div>
+      <button id="logoutBtn">Log Out</button>
+    </div>
+  </header>
+
+ 
+
+  <main>
+    <div class="top-buttons">
+ <ul>
+       <button class="btn-primary" onclick="window.location.href='forms.html'">
+  Request Playdate / Carpool
+</button>
+
+<button class="btn-secondary" onclick="window.location.href='participant-request.html'">
+  View My Requests
+</button>
+
+<button class="btn-light" onclick="location.reload()">
+  Refresh
+</button>
+
+<button class="btn-light" onclick="window.location.href='contact.html'">
+  Contacts
+</button>
+</ul>
+
+    <div class="columns">
+      <!-- Connections Column -->
+      <section class="column">
+        <h2>My Connections</h2>
+        <p class="small-text">
+          These are families who share your school / group code.
+          You can send playdate and carpool requests to them.
+        </p>
+        <ul id="connectionsList" class="connections-list"></ul>
+      </section>
+
+      <!-- Events Column -->
+      <section class="column">
+        <h2>Upcoming Events</h2>
+        <p class="small-text">
+          Post and see events shared by families at your school or in your group
+          (park meetups, school events, practice times, etc.).
+        </p>
+
+        <!-- Event Form -->
+        <form id="eventForm" class="event-form">
+          <label for="eventTitle">Event Title</label>
+          <input type="text" id="eventTitle" required placeholder="e.g. Playground Meetup" />
+
+          <label for="eventDate">Date</label>
+          <input type="date" id="eventDate" />
+
+          <label for="eventLocation">Location</label>
+          <input type="text" id="eventLocation" placeholder="e.g. Oak Hill Park" />
+
+          <label for="eventDescription">Description</label>
+          <textarea id="eventDescription" placeholder="Time, details, what to bring, etc."></textarea>
+
+          <button type="submit">Post Event</button>
+        </form>
+
+        <!-- Event Feed -->
+        <div id="eventsFeed" style="margin-top: 12px;"></div>
+      </section>
+    </div>
+  </main>
+
+ <script>
+  (function () {
+    const API_BASE_URL = "http://localhost:5000/api";
+
+    function getToken() {
+      return localStorage.getItem("authToken");
+    }
+
+    function getCurrentUserFromStorage() {
+      const raw = localStorage.getItem("currentUser");
+      if (!raw) return null;
+      try {
+        return JSON.parse(raw);
+      } catch {
+        return null;
+      }
+    }
+
+    function ensureLoggedIn() {
+      const user = getCurrentUserFromStorage();
+      const token = getToken();
+      if (!user || !token) {
+        alert("Please log in first.");
+        window.location.href = "auth.html";
+        return null;
+      }
+      return { user, token };
+    }
+
+    const auth = ensureLoggedIn();
+    if (!auth) return;
+    const { user, token } = auth;
+    const currentUser = user;
+
+    // ===== Fill in header user info =====
+    document.getElementById("userFamilyName").textContent =
+      currentUser.familyName || "Family";
+    document.getElementById("userEmail").textContent =
+      "Email: " + (currentUser.email || "");
+    document.getElementById("userSchoolCode").textContent =
+      "School / Group Code: " + (currentUser.schoolCode || "N/A");
+
+    // ===== Logout =====
+    document.getElementById("logoutBtn").addEventListener("click", () => {
+      localStorage.removeItem("authToken");
+      localStorage.removeItem("currentUser");
+      localStorage.removeItem("currentUserEmail");
+      window.location.href = "auth.html";
+    });
+
+    // ===== Connections (still using local demo data) =====
+    function getUsersLocal() {
+      return JSON.parse(localStorage.getItem("users")) || [];
+    }
+
+    const connectionsListEl = document.getElementById("connectionsList");
+
+    function renderConnections() {
+      const users = getUsersLocal();
+      connectionsListEl.innerHTML = "";
+
+      const connections = Array.isArray(currentUser.connections)
+        ? currentUser.connections
+        : [];
+
+      if (connections.length === 0) {
+        connectionsListEl.innerHTML =
+          "<li>No connections yet. Share your code with other families at your school.</li>";
+        return;
+      }
+
+      connections.forEach(email => {
+        const otherUser = users.find(u => u.email === email);
+        const li = document.createElement("li");
+        if (otherUser) {
+          li.textContent = `${otherUser.familyName || "Family"} — ${otherUser.email}`;
+        } else {
+          li.textContent = email;
+        }
+        connectionsListEl.appendChild(li);
+      });
+    }
+
+    // ===== Events via backend =====
+    const eventForm = document.getElementById("eventForm");
+    const eventsFeedEl = document.getElementById("eventsFeed");
+
+    async function fetchEvents() {
+      const res = await fetch(`${API_BASE_URL}/events`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      if (!res.ok) {
+        throw new Error("Failed to load events");
+      }
+      return res.json();
+    }
+
+    function formatDate(dateStr) {
+      if (!dateStr) return "";
+      const d = new Date(dateStr);
+      if (Number.isNaN(d.getTime())) return dateStr;
+      return d.toLocaleDateString();
+    }
+
+    async function renderEvents() {
+      eventsFeedEl.innerHTML = "<p class='no-events'>Loading events...</p>";
+      try {
+        const events = await fetchEvents();
+
+        eventsFeedEl.innerHTML = "";
+
+        if (!events.length) {
+          const p = document.createElement("p");
+          p.className = "no-events";
+          p.textContent =
+            "No events posted yet. Be the first to post something for your school or group!";
+          eventsFeedEl.appendChild(p);
+          return;
+        }
+
+        const sorted = [...events].sort(
+          (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+        );
+
+        sorted.forEach(ev => {
+          const div = document.createElement("div");
+          div.className = "event-card";
+
+          const title = document.createElement("h3");
+          title.textContent = ev.title || "Untitled Event";
+
+          const meta = document.createElement("div");
+          meta.className = "event-meta";
+          const by = ev.createdBy && ev.createdBy.familyName
+            ? ev.createdBy.familyName
+            : "Another family";
+          const datePart = ev.date ? formatDate(ev.date) : "No date";
+          const locPart = ev.location || "";
+          meta.textContent = `${datePart}${locPart ? " • " + locPart : ""} • Posted by ${by}`;
+
+          const desc = document.createElement("div");
+          desc.className = "event-description";
+          desc.textContent = ev.description || "";
+
+          div.appendChild(title);
+          div.appendChild(meta);
+          div.appendChild(desc);
+          eventsFeedEl.appendChild(div);
+        });
+      } catch (err) {
+        console.error(err);
+        eventsFeedEl.innerHTML =
+          "<p class='no-events'>Could not load events. Is the server running?</p>";
+      }
+    }
+
+    eventForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const title = document.getElementById("eventTitle").value.trim();
+      const date = document.getElementById("eventDate").value;
+      const location = document.getElementById("eventLocation").value.trim();
+      const description = document.getElementById("eventDescription").value.trim();
+
+      if (!title) {
+        alert("Please enter an event title.");
+        return;
+      }
+
+      try {
+        const res = await fetch(`${API_BASE_URL}/events`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`
+          },
+          body: JSON.stringify({ title, date, location, description })
+        });
+
+        const data = await res.json().catch(() => ({}));
+
+        if (!res.ok) {
+          alert(data.message || "Could not save event.");
+          return;
+        }
+
+        eventForm.reset();
+        await renderEvents();
+      } catch (err) {
+        console.error(err);
+        alert("Error contacting server while saving event.");
+      }
+    });
+
+    // Initial render
+    renderConnections();
+    renderEvents();
+  })();
+</script>
+
+
+</body>
+</html> -->

@@ -1,0 +1,316 @@
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  background: #f7f7f7;
+}
+
+/* Navbar */
+.nav-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #ff8ab5;
+  color: #fff;
+  padding: 10px 16px;
+}
+
+.brand {
+  text-decoration: none;
+  color: #fff;
+  font-weight: 700;
+  font-size: 20px;
+}
+
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.nav-link {
+  text-decoration: none;
+  color: #fff;
+  font-size: 14px;
+}
+
+.nav-user {
+  font-size: 13px;
+  opacity: 0.9;
+}
+
+.nav-button {
+  border: none;
+  background: #ff4f7c;
+  color: #fff;
+  padding: 6px 10px;
+  border-radius: 999px;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.page-main {
+  padding: 16px;
+}
+
+/* Auth */
+.auth-container {
+  max-width: 420px;
+  margin: 40px auto;
+  background: #fff;
+  padding: 20px 24px;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+}
+
+.auth-container h1 {
+  text-align: center;
+  margin-top: 0;
+}
+
+.auth-toggle {
+  display: flex;
+  margin: 12px 0;
+  border-radius: 999px;
+  background: #ffe0ec;
+  padding: 4px;
+}
+
+.auth-tab {
+  flex: 1;
+  border: none;
+  background: transparent;
+  padding: 6px 0;
+  border-radius: 999px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.auth-tab.active {
+  background: #ff8ab5;
+  color: #fff;
+}
+
+.auth-form label {
+  display: block;
+  margin-top: 8px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.auth-form input {
+  width: 100%;
+  margin-top: 4px;
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+}
+
+.helper-text {
+  font-size: 13px;
+  color: #555;
+}
+
+.btn-primary {
+  margin-top: 12px;
+  width: 100%;
+  padding: 10px;
+  border: none;
+  background: #ff8ab5;
+  color: #fff;
+  border-radius: 999px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* Layout */
+.page-container {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.top-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.btn-secondary {
+  padding: 8px 12px;
+  border-radius: 999px;
+  border: none;
+  background: #ffd3e3;
+  color: #333;
+  cursor: pointer;
+}
+
+.columns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.column {
+  flex: 1 1 300px;
+  background: #fff;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 1px 8px rgba(0, 0, 0, 0.05);
+}
+
+.small-text {
+  font-size: 13px;
+  color: #555;
+}
+
+.simple-list {
+  list-style: none;
+  padding-left: 0;
+}
+
+.simple-list li {
+  border-bottom: 1px solid #eee;
+  padding: 4px 0;
+}
+
+.event-card {
+  border: 1px solid #eee;
+  border-radius: 8px;
+  padding: 8px;
+  margin-top: 8px;
+  background: #fff8fc;
+}
+
+.event-card h3 {
+  margin: 0 0 4px 0;
+}
+
+/* Request form */
+.request-form label,
+.event-form label {
+  display: block;
+  margin-top: 8px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.request-form input,
+.request-form select,
+.request-form textarea,
+.event-form input,
+.event-form textarea {
+  width: 100%;
+  margin-top: 4px;
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+}
+
+.request-form textarea,
+.event-form textarea {
+  min-height: 70px;
+}
+
+/* Tables */
+.table-wrapper {
+  overflow-x: auto;
+}
+
+.simple-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+}
+
+.simple-table th,
+.simple-table td {
+  border: 1px solid #eee;
+  padding: 6px;
+  font-size: 13px;
+}
+
+.thumb {
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+  border-radius: 6px;
+}
+
+.thumb-large {
+  width: 90px;
+  height: 90px;
+  object-fit: cover;
+  border-radius: 10px;
+}
+
+.small-textarea {
+  width: 100%;
+  min-height: 50px;
+}
+
+/* Cards for RequestsToMe */
+.cards {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.request-card {
+  display: flex;
+  gap: 12px;
+  background: #fff;
+  border-radius: 12px;
+  padding: 12px;
+  box-shadow: 0 1px 8px rgba(0, 0, 0, 0.05);
+}
+
+.request-card-photo {
+  min-width: 100px;
+}
+
+.request-card-body h3 {
+  margin: 0 0 4px 0;
+}
+
+.status-row {
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.status-badge {
+  padding: 3px 8px;
+  border-radius: 999px;
+  font-size: 12px;
+  text-transform: capitalize;
+}
+
+.status-pending {
+  background: #ffe8a3;
+}
+
+.status-accepted {
+  background: #b9f6c3;
+}
+
+.status-declined {
+  background: #ffb3b3;
+}
+
+.status-buttons .btn-accept,
+.status-buttons .btn-decline {
+  border: none;
+  border-radius: 999px;
+  padding: 6px 10px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.btn-accept {
+  background: #80e27e;
+}
+
+.btn-decline {
+  background: #ff8a80;
+}
