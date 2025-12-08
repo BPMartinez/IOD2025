@@ -30,9 +30,7 @@ export function clearAuth() {
   localStorage.removeItem("currentUserEmail");
 }
 
-/* =========================================
-   Core request() with auto-token
-========================================= */
+
 
 async function request(path, { method = "GET", body, headers = {} } = {}) {
   const token = getToken();
@@ -91,7 +89,7 @@ export function createEvent(payload) {
   });
 }
 
-// POST /api/events/:id/going  (RSVP toggle)
+
 export function toggleEventGoing(eventId) {
   return request(`/events/${eventId}/going`, {
     method: "POST",
@@ -113,7 +111,7 @@ export function updateEventComment(eventId, commentId, text) {
   });
 }
 
-// 🆕 delete a comment
+
 export function deleteEventComment(eventId, commentId) {
   return request(`/events/${eventId}/comments/${commentId}`, {
     method: "DELETE",

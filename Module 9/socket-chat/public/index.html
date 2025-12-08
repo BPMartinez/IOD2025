@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Socket.IO Chat</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        height: 100vh;
+      }
+      #sidebar {
+        width: 220px;
+        background: #f4f4f4;
+        border-right: 1px solid #ddd;
+        padding: 10px;
+        box-sizing: border-box;
+      }
+      #main {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+      }
+      #messages {
+        flex: 1;
+        padding: 10px;
+        overflow-y: auto;
+        border-bottom: 1px solid #ddd;
+      }
+      #typing {
+        font-size: 0.9rem;
+        color: #666;
+        min-height: 20px;
+        padding: 5px 10px;
+      }
+      #form {
+        display: flex;
+        padding: 10px;
+        box-sizing: border-box;
+      }
+      #input {
+        flex: 1;
+        padding: 8px;
+        font-size: 1rem;
+      }
+      button {
+        margin-left: 10px;
+        padding: 8px 14px;
+      }
+      .system {
+        color: #999;
+        font-style: italic;
+      }
+      .self {
+        color: #007bff;
+      }
+      #nickname-form {
+        margin-bottom: 20px;
+      }
+      #online-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+      #online-list li {
+        margin-bottom: 4px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="sidebar">
+      <h3>Nickname</h3>
+      <form id="nickname-form">
+        <input
+          id="nickname-input"
+          type="text"
+          placeholder="Enter nickname"
+          autocomplete="off"
+        />
+        <button type="submit">Set</button>
+      </form>
+
+      <h3>Online</h3>
+      <ul id="online-list"></ul>
+    </div>
+
+    <div id="main">
+      <div id="messages"></div>
+      <div id="typing"></div>
+
+      <form id="form">
+        <input id="input" autocomplete="off" placeholder="Type a message..." />
+        <button type="submit">Send</button>
+      </form>
+    </div>
+
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+      const socket = io();
+
+      const form = document.getElementById("form");
+      const input = document.getElementById("input");
+      const messagesDiv = document.getElementById("messages");
+      const typingDiv = document.getElementById("typing");
+
+      const nicknameForm = document.getElementById("nickname-form");
+      const nicknameInput = document.getElementById("nickname-input");
+      const onlineList = document.getElementById("online-list");
+
+      let myNickname = "";
+
+
+      function addMessage(text, className = "") {
+        const div = document.createElement("div");
+        if (className) div.classList.add(className);
+        div.textContent = text;
+        messagesDiv.appendChild(div);
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+      }
+
+
+      function renderOnlineUsers(users) {
+        onlineList.innerHTML = "";
+        users.forEach((u) => {
+          const li = document.createElement("li");
+          li.textContent = u;
+          onlineList.appendChild(li);
+        });
+      }
+
+      nicknameForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const newName = nicknameInput.value.trim();
+        if (!newName) return;
+        myNickname = newName;
+        socket.emit("set nickname", newName);
+        nicknameInput.value = "";
+      });
+
+      form.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const msg = input.value.trim();
+        if (!msg) return;
+
+        const displayName = myNickname || "Me";
+        addMessage(`${displayName}: ${msg}`, "self");
+
+
+        socket.emit("chat message", msg);
+
+        input.value = "";
+        socket.emit("typing", false); 
+      });
+
+
+      let typingTimeout;
+      input.addEventListener("input", () => {
+        socket.emit("typing", true);
+
+        clearTimeout(typingTimeout);
+        typingTimeout = setTimeout(() => {
+          socket.emit("typing", false);
+        }, 800);
+      });
+
+
+      socket.on("chat message", (data) => {
+        addMessage(`${data.nickname}: ${data.message}`);
+      });
+
+
+      socket.on("user connected", (nickname) => {
+        addMessage(`${nickname} joined the chat`, "system");
+      });
+
+ 
+      socket.on("user disconnected", (nickname) => {
+        addMessage(`${nickname} left the chat`, "system");
+      });
+
+  
+      socket.on("user list", (users) => {
+        renderOnlineUsers(users);
+      });
+
+
+      socket.on("nickname changed", ({ oldName, newName }) => {
+        addMessage(`${oldName} is now known as ${newName}`, "system");
+      });
+
+
+      socket.on("user typing", (nickname) => {
+        typingDiv.textContent = `${nickname} is typing...`;
+      });
+
+      socket.on("user stop typing", (nickname) => {
+
+        if (typingDiv.textContent.startsWith(nickname)) {
+          typingDiv.textContent = "";
+        }
+      });
+    </script>
+  </body>
+</html>

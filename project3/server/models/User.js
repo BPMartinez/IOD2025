@@ -11,7 +11,7 @@ const userSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true },
   passwordHash: { type: String, required: true },
   schoolCode: { type: String, required: true },
-  children: [childSchema], // ⭐ new field
+  children: [childSchema], 
 });
 
 module.exports = mongoose.model("User", userSchema);

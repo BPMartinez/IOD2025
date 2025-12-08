@@ -1,21 +1,17 @@
-// controllers/familyController.js
+
 const User = require("../models/User");
 
-/**
- * GET /api/families/network
- * Return all families (users) that share the same schoolCode
- * as the logged-in user.
- */
+
 const getSchoolNetwork = async (req, res) => {
   try {
-    const user = req.user; // set by auth middleware
+    const user = req.user; 
     if (!user) {
       return res.status(401).json({ message: "Not authenticated" });
     }
 
     const families = await User.find(
       { schoolCode: user.schoolCode },
-      { passwordHash: 0, __v: 0 } // hide password + version
+      { passwordHash: 0, __v: 0 } 
     );
 
     res.json(families);
@@ -25,10 +21,7 @@ const getSchoolNetwork = async (req, res) => {
   }
 };
 
-/**
- * POST /api/families/children
- * Add a child profile to the current family (logged-in user)
- */
+
 const createChildProfile = async (req, res) => {
   try {
     const user = req.user;
@@ -42,7 +35,7 @@ const createChildProfile = async (req, res) => {
       return res.status(400).json({ message: "Name and grade are required" });
     }
 
-    // Reload the user from DB to be safe
+
     const dbUser = await User.findById(user._id);
     if (!dbUser) {
       return res.status(404).json({ message: "Family not found" });
@@ -67,10 +60,7 @@ const createChildProfile = async (req, res) => {
   }
 };
 
-/**
- * PUT /api/families/children/:childId
- * Update an existing child profile for the logged-in user
- */
+
 const updateChildProfile = async (req, res) => {
   try {
     const user = req.user;
@@ -86,13 +76,12 @@ const updateChildProfile = async (req, res) => {
       return res.status(404).json({ message: "Family not found" });
     }
 
-    // Find child by its _id in the children array (Mongoose subdocument)
+    
     const child = dbUser.children.id(childId);
     if (!child) {
       return res.status(404).json({ message: "Child not found" });
     }
 
-    // Only update fields that are provided
     if (name !== undefined) child.name = name.trim();
     if (grade !== undefined) child.grade = grade.trim();
     if (photoUrl !== undefined) child.photoUrl = photoUrl.trim();
@@ -109,10 +98,7 @@ const updateChildProfile = async (req, res) => {
   }
 };
 
-/**
- * DELETE /api/families/children/:childId
- * Delete a child profile from the logged-in user's family
- */
+
 const deleteChildProfile = async (req, res) => {
   try {
     const user = req.user;
@@ -132,7 +118,6 @@ const deleteChildProfile = async (req, res) => {
       return res.status(404).json({ message: "Child not found" });
     }
 
-    // Remove the subdocument
     child.deleteOne();
     await dbUser.save();
 
