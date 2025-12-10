@@ -12,8 +12,12 @@ export default function App() {
       <Route path="/auth" element={<AuthPage />} />
       <Route path="/home" element={<HomePage />} />
       <Route path="/request" element={<RequestFormPage />} />
+
+      {/* ✅ ADD THIS ROUTE */}
       <Route path="/requests" element={<MyRequestsPage />} />
+
       <Route path="/incoming" element={<IncomingRequestsPage />} />
+
       {/* default route */}
       <Route path="*" element={<Navigate to="/auth" replace />} />
     </Routes>

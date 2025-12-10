@@ -29,8 +29,6 @@ export default function HomePage() {
   });
 
   const [commentText, setCommentText] = useState({});
-
-
   const [editingComment, setEditingComment] = useState({
     eventId: null,
     commentId: null,
@@ -249,17 +247,28 @@ export default function HomePage() {
   };
 
   return (
-    <div style={{ maxWidth: 1100, margin: "20px auto", padding: "0 16px" }}>
+    <div
+      style={{
+        maxWidth: 1100,
+        margin: "30px auto",
+        padding: "0 16px",
+      }}
+    >
+      {/* Header with welcome + nav buttons */}
       <header
         style={{
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
+          gap: 16,
           marginBottom: 20,
+          flexWrap: "wrap",
         }}
       >
         <div>
-          <h2 style={{ marginBottom: 4 }}>Welcome, {user.familyName} </h2>
+          <h2 style={{ marginBottom: 4 }}>
+            Welcome, {user.familyName}
+          </h2>
           <div style={{ fontSize: 13, color: "#555" }}>
             <div>{user.email}</div>
             <div>School / Group Code: {user.schoolCode}</div>
@@ -271,7 +280,7 @@ export default function HomePage() {
             New Request
           </Link>
           <Link to="/requests" style={linkBtn}>
-            Past Hangouts
+            Hangouts
           </Link>
           <Link to="/incoming" style={linkBtn}>
             Requests To Me
@@ -297,6 +306,7 @@ export default function HomePage() {
         </div>
       )}
 
+      {/* Main layout: SchoolNetwork + Events */}
       <div
         style={{
           display: "grid",
@@ -305,10 +315,21 @@ export default function HomePage() {
           alignItems: "flex-start",
         }}
       >
-        <SchoolNetwork />
+        {/* Left: School network card */}
+        <div
+          style={{
+            background: "#fff",
+            padding: 16,
+            borderRadius: 10,
+            boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
+          }}
+        >
+          <SchoolNetwork />
+        </div>
 
+        {/* Right: Event form + event list */}
         <section>
-          {/* New event form */}
+          {/* New event form card */}
           <div
             style={{
               background: "#fff",
@@ -387,7 +408,7 @@ export default function HomePage() {
             </form>
           </div>
 
-          {/* Events list */}
+          {/* Events list card */}
           <div
             style={{
               background: "#fff",
@@ -423,12 +444,29 @@ export default function HomePage() {
                       }}
                     >
                       <div>
-                        <h4 style={{ margin: "0 0 4px" }}>{ev.title}</h4>
-                        <div style={{ color: "#666" }}>
+                        <h4
+                          style={{
+                            margin: "0 0 4px",
+                            color: "#9b145a",
+                          }}
+                        >
+                          {ev.title}
+                        </h4>
+                        <div style={{ color: "#bf6895" }}>
                           {ev.date && <span>{ev.date}</span>}
                           {ev.time && <span> · {ev.time}</span>}
                           {ev.location && <span> · {ev.location}</span>}
                         </div>
+                        {ev.description && (
+                          <p
+                            style={{
+                              marginTop: 6,
+                              color: "#555",
+                            }}
+                          >
+                            {ev.description}
+                          </p>
+                        )}
                       </div>
 
                       <div style={{ textAlign: "right" }}>
@@ -438,9 +476,9 @@ export default function HomePage() {
                           style={{
                             padding: "4px 8px",
                             borderRadius: 6,
-                            border: "1px solid #fb9dd0ff",
-                            background: iAmGoing ? "#fb9dd0ff" : "#fff",
-                            color: iAmGoing ? "#fff" : "#fb9dd0ff",
+                            border: "1px solid #fb9dd0",
+                            background: iAmGoing ? "#fb9dd0" : "#fff",
+                            color: iAmGoing ? "#fff" : "#fb9dd0",
                             fontSize: 12,
                             cursor: "pointer",
                           }}
@@ -473,10 +511,6 @@ export default function HomePage() {
                         )}
                       </div>
                     </div>
-
-                    {ev.description && (
-                      <p style={{ marginTop: 6 }}>{ev.description}</p>
-                    )}
 
                     {/* Comments */}
                     <div style={{ marginTop: 8 }}>
@@ -675,7 +709,12 @@ export default function HomePage() {
 function Label({ children }) {
   return (
     <label
-      style={{ display: "block", marginTop: 10, fontWeight: "bold", fontSize: 14 }}
+      style={{
+        display: "block",
+        marginTop: 10,
+        fontWeight: "bold",
+        fontSize: 14,
+      }}
     >
       {children}
     </label>
@@ -701,23 +740,22 @@ function Input(props) {
 }
 
 const linkBtn = {
-  textDecoration: "none",
   padding: "6px 10px",
   borderRadius: 6,
-  border: "1px solid #fb9dd0ff",
-  background: "#fff",
-  color: "#fb9dd0ff",
+  background: "#f7b6cd",
+  color: "#fff",
+  textDecoration: "none",
   fontSize: 13,
+  fontWeight: 600,
+  border: "none",
+  display: "inline-block",
 };
 
 const logoutBtn = {
-  padding: "6px 10px",
-  borderRadius: 6,
-  border: "none",
-  background: "#d9534f",
-  color: "#fff",
-  fontSize: 13,
-  cursor: "pointer",
+  ...linkBtn,
+  background: "#fff",
+  color: "#f7b6cd",
+  border: "1px solid #f7b6cd",
 };
 
 const primaryBtn = {
@@ -725,7 +763,7 @@ const primaryBtn = {
   padding: 10,
   borderRadius: 6,
   border: "none",
-  background: "#fb9dd0ff",
+  background: "#fb9dd0",
   color: "white",
   fontSize: 14,
   cursor: "pointer",

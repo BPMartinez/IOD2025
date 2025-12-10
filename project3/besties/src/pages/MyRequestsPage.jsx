@@ -1,6 +1,5 @@
-// src/pages/MyRequestsPage.jsx
 import React, { useEffect, useState } from "react";
-import { Navigate } from "react-router-dom";
+import { Navigate, Link, useNavigate } from "react-router-dom";
 import {
   getCurrentUser,
   fetchMyRequests,
@@ -9,6 +8,8 @@ import {
 
 export default function MyRequestsPage() {
   const user = getCurrentUser();
+  const navigate = useNavigate();
+
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -57,12 +58,48 @@ export default function MyRequestsPage() {
     }
   };
 
+  const handleLogout = () => {
+    // Adjust this to match however you're actually storing auth
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    navigate("/auth");
+  };
+
   return (
     <div style={{ maxWidth: 900, margin: "30px auto", padding: "0 16px" }}>
-      <h2>Past Hangouts</h2>
-      <p style={{ fontSize: 14, color: "#555" }}>
-        These are all the requests your family has sent or received.
-      </p>
+      {/* Header with title + buttons */}
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          gap: 16,
+          marginBottom: 16,
+          flexWrap: "wrap",
+        }}
+      >
+        <div>
+          <h2 style={{ margin: 0 }}>Hangouts</h2>
+          <p style={{ fontSize: 14, color: "#555", marginTop: 4 }}>
+            These are all the requests your family has sent or received.
+          </p>
+        </div>
+
+        <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+          <Link to="/home" style={linkBtn}>
+            Home
+          </Link>
+          <Link to="/request" style={linkBtn}>
+            New Request
+          </Link>
+          <Link to="/incoming" style={linkBtn}>
+            Requests To Me
+          </Link>
+          <button onClick={handleLogout} style={logoutBtn}>
+            Log Out
+          </button>
+        </div>
+      </div>
 
       {error && (
         <div
@@ -104,7 +141,8 @@ export default function MyRequestsPage() {
           </thead>
           <tbody>
             {requests.map((req) => {
-              const isSender = req.fromUser && req.fromUser.email === user.email;
+              const isSender =
+                req.fromUser && req.fromUser.email === user.email;
               const fromEmail = req.fromUser?.email || "";
               const toEmail = req.toUser?.email || "";
               return (
@@ -161,4 +199,23 @@ const thTd = {
   border: "1px solid #ddd",
   padding: "6px 8px",
   verticalAlign: "top",
+};
+
+const linkBtn = {
+  padding: "6px 10px",
+  borderRadius: 6,
+  background: "#f7b6cd",
+  color: "#fff",
+  textDecoration: "none",
+  fontSize: 13,
+  fontWeight: 600,
+  border: "none",
+  display: "inline-block",
+};
+
+const logoutBtn = {
+  ...linkBtn,
+  background: "#fff",
+  color: "#f7b6cd",
+  border: "1px solid #f7b6cd",
 };

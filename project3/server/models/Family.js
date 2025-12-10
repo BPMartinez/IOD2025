@@ -3,8 +3,11 @@ const mongoose = require("mongoose");
 const childSchema = new mongoose.Schema({
   name: { type: String, required: true },
   grade: { type: String, required: true },
+
+  photoData: { type: String, default: "" },
   photoUrl: { type: String, default: "" },
 });
+
 
 const familySchema = new mongoose.Schema({
   familyName: { type: String, required: true },

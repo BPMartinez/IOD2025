@@ -10,51 +10,43 @@ const familyRoutes = require("./routes/familyRoutes");
 
 const app = express();
 
-
-
-const allowedOrigins = [
-  "http://localhost:3000",
-  "http://localhost:3001",
-  "http://localhost:3003",
-  "http://localhost:3004",
-];
-
-
+/* =========================================
+   CORS – DEV: allow any origin (localhost)
+   ========================================= */
 app.use(
   cors({
-    origin: allowedOrigins,
+    origin: true,        // reflect request origin
     credentials: true,
   })
 );
 
+// Preflight for all routes
+app.options("*", cors({ origin: true, credentials: true }));
 
-app.options(
-  "*",
-  cors({
-    origin: allowedOrigins,
-    credentials: true,
-  })
-);
-
-
+/* =========================================
+   Body parsing
+   ========================================= */
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true }));
 
-
-
+/* =========================================
+   Health check
+   ========================================= */
 app.get("/", (req, res) => {
   res.send("Besties API is running");
 });
 
-
-
+/* =========================================
+   Routes
+   ========================================= */
 app.use("/api/auth", authRoutes);
 app.use("/api/requests", requestRoutes);
 app.use("/api/events", eventRoutes);
 app.use("/api/families", familyRoutes);
 
-
-
+/* =========================================
+   404 for API routes
+   ========================================= */
 app.use((req, res, next) => {
   if (req.path.startsWith("/api")) {
     return res.status(404).json({ message: "API route not found" });
@@ -62,8 +54,9 @@ app.use((req, res, next) => {
   next();
 });
 
-
-
+/* =========================================
+   Error handler
+   ========================================= */
 app.use((err, req, res, next) => {
   console.error("Unhandled error:", err);
   res.status(err.status || 500).json({
@@ -71,14 +64,26 @@ app.use((err, req, res, next) => {
   });
 });
 
-
-
-const PORT = process.env.PORT || 5005;
+/* =========================================
+   Start server
+   ========================================= */
+const PORT = Number(process.env.PORT) || 5006;
 
 connectDB()
   .then(() => {
-    app.listen(PORT, () => {
-      console.log(`Server running on port ${PORT}`);
+    const server = app.listen(PORT, () => {
+      console.log(`🚀 Server running on port ${PORT}`);
+    });
+
+    server.on("error", (err) => {
+      if (err.code === "EADDRINUSE") {
+        console.error(
+          `❌ Port ${PORT} already in use. Stop the other process or change PORT in .env.`
+        );
+        process.exit(1);
+      } else {
+        throw err;
+      }
     });
   })
   .catch((err) => {

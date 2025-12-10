@@ -1,10 +1,11 @@
 // src/pages/IncomingRequestsPage.jsx
 import React, { useEffect, useState } from "react";
-import { Navigate } from "react-router-dom";
+import { Navigate, Link } from "react-router-dom";
 import {
   getCurrentUser,
   fetchInboundRequests,
   updateRequestStatus,
+  clearAuth,
 } from "../api/client";
 
 export default function IncomingRequestsPage() {
@@ -14,7 +15,10 @@ export default function IncomingRequestsPage() {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    if (!user) return;
+    if (!user) {
+      setLoading(false);
+      return;
+    }
 
     const load = async () => {
       try {
@@ -43,6 +47,11 @@ export default function IncomingRequestsPage() {
     );
   }
 
+  const handleLogout = () => {
+    clearAuth();
+    window.location.href = "/auth";
+  };
+
   const handleStatusChange = async (id, status) => {
     try {
       await updateRequestStatus(id, status);
@@ -57,10 +66,42 @@ export default function IncomingRequestsPage() {
 
   return (
     <div style={{ maxWidth: 900, margin: "30px auto", padding: "0 16px" }}>
-      <h2>Requests Sent To Me</h2>
-      <p style={{ fontSize: 14, color: "#555" }}>
-        These are requests that other families have sent to your family.
-      </p>
+      {/* Header to match Home/MyRequests */}
+      <header
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          gap: 16,
+          marginBottom: 20,
+          flexWrap: "wrap",
+        }}
+      >
+        <div>
+          <h2 style={{ marginBottom: 4 }}>Requests Sent To Me</h2>
+          <p style={{ fontSize: 13, color: "#555", margin: 0 }}>
+            These are requests that other families have sent to your family.
+          </p>
+          <div style={{ fontSize: 12, color: "#777", marginTop: 4 }}>
+            {user.familyName} · {user.email}
+          </div>
+        </div>
+
+        <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+          <Link to="/request" style={linkBtn}>
+            New Request
+          </Link>
+          <Link to="/requests" style={linkBtn}>
+            Hangouts
+          </Link>
+          <Link to="/incoming" style={linkBtn}>
+            Requests To Me
+          </Link>
+          <button onClick={handleLogout} style={logoutBtn}>
+            Log Out
+          </button>
+        </div>
+      </header>
 
       {error && (
         <div
@@ -82,23 +123,31 @@ export default function IncomingRequestsPage() {
       ) : (
         requests.map((req) => (
           <div key={req._id} style={cardStyle}>
-            <h3>{req.purpose || req.type || "Request"}</h3>
-            <p>
+            <h3 style={{ marginTop: 0 }}>
+              {req.purpose || req.type || "Request"}
+            </h3>
+            <p style={{ fontSize: 14, margin: "4px 0" }}>
               <strong>From:</strong>{" "}
               {req.fromUser?.familyName || "Another family"} (
               {req.fromUser?.email || ""})
             </p>
-            <p>
-              <strong>Child:</strong> {req.childName || ""}
-            </p>
-            <p>
-              <strong>Date:</strong> {req.date || ""}{" "}
-              <strong>Time:</strong> {req.time || ""}
-            </p>
-            <p>
-              <strong>Notes:</strong> {req.notes || ""}
-            </p>
-            <p>
+            {req.childName && (
+              <p style={{ fontSize: 14, margin: "4px 0" }}>
+                <strong>Child:</strong> {req.childName}
+              </p>
+            )}
+            {(req.date || req.time) && (
+              <p style={{ fontSize: 14, margin: "4px 0" }}>
+                <strong>Date:</strong> {req.date || "TBA"}{" "}
+                <strong>Time:</strong> {req.time || "TBA"}
+              </p>
+            )}
+            {req.notes && (
+              <p style={{ fontSize: 14, margin: "4px 0" }}>
+                <strong>Notes:</strong> {req.notes}
+              </p>
+            )}
+            <p style={{ fontSize: 14, margin: "4px 0" }}>
               <strong>Status:</strong> {req.status || "pending"}
             </p>
             <div style={{ marginTop: 10 }}>
@@ -121,6 +170,27 @@ export default function IncomingRequestsPage() {
     </div>
   );
 }
+
+const linkBtn = {
+  textDecoration: "none",
+  padding: "6px 10px",
+  borderRadius: 6,
+  border: "1px solid #fb9dd0ff",
+  background: "#fff",
+  color: "#fb9dd0ff",
+  fontSize: 13,
+  fontWeight: 600,
+};
+
+const logoutBtn = {
+  padding: "6px 10px",
+  borderRadius: 6,
+  border: "none",
+  background: "#d9534f",
+  color: "#fff",
+  fontSize: 13,
+  cursor: "pointer",
+};
 
 const cardStyle = {
   background: "#fff",

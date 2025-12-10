@@ -73,17 +73,18 @@ export default function AuthPage() {
 
   return (
     <div
-      style={{
-        minHeight: "100vh",
-        backgroundImage: `url("https://export-download.canva.com/NQf1A/DAG50LNQf1A/6/0/0001-7458446769258765633.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAQYCGKMUH5AO7UJ26%2F20251126%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20251126T021850Z&X-Amz-Expires=59731&X-Amz-Signature=3c57be771b03a0825e7e0bbc46ba8073163dd3aa954ed68f480b8eba1b892bec&X-Amz-SignedHeaders=host&response-content-disposition=attachment%3B%20filename%2A%3DUTF-8%27%27Untitled%2520design.png&response-expires=Wed%2C%2026%20Nov%202025%2018%3A54%3A21%20GMT")`,
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        padding: "20px",
-      }}
-    >
+  style={{
+    minHeight: "100vh",
+    backgroundImage: 'url("/images/auth-bg.png")',
+    backgroundSize: "cover",
+    backgroundPosition: "center",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    padding: "20px",
+  }}
+>
+
       <div
         style={{
           width: "100%",
@@ -163,7 +164,7 @@ export default function AuthPage() {
             <>
               Already have an account?{" "}
               <span className="auth-link" onClick={() => setMode("login")}>
-                Log in
+             Login
               </span>
             </>
           ) : (

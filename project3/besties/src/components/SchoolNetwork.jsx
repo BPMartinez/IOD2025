@@ -1,10 +1,11 @@
+// src/components/SchoolNetwork.jsx
 import React, { useEffect, useState } from "react";
 import {
   getCurrentUser,
   fetchSchoolNetwork,
   createChildProfile,
-  updateChildProfile,   // 🆕
-  deleteChildProfile,   // 🆕
+  updateChildProfile,
+  deleteChildProfile,
 } from "../api/client";
 
 export default function SchoolNetwork() {
@@ -14,15 +15,13 @@ export default function SchoolNetwork() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
- 
   const [childForm, setChildForm] = useState({
     name: "",
     grade: "",
+    photoData: "",
     photoUrl: "",
   });
   const [savingChild, setSavingChild] = useState(false);
-
-
   const [editingChildId, setEditingChildId] = useState(null);
 
   useEffect(() => {
@@ -34,7 +33,6 @@ export default function SchoolNetwork() {
     const load = async () => {
       try {
         const data = await fetchSchoolNetwork();
-        
         setFamilies(data || []);
       } catch (err) {
         console.error(err);
@@ -47,21 +45,33 @@ export default function SchoolNetwork() {
     load();
   }, [user]);
 
-  if (!user) {
-    
-    return null;
-  }
+  if (!user) return null;
 
   const handleChildChange = (e) => {
     const { name, value } = e.target;
     setChildForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  
+  // 📸 file → base64
+  const handleChildPhotoChange = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setChildForm((prev) => ({
+        ...prev,
+        photoData: reader.result, // base64 string
+      }));
+    };
+    reader.readAsDataURL(file);
+  };
+
   const resetChildForm = () => {
     setChildForm({
       name: "",
       grade: "",
+      photoData: "",
       photoUrl: "",
     });
     setEditingChildId(null);
@@ -82,11 +92,11 @@ export default function SchoolNetwork() {
       const payload = {
         name: childForm.name.trim(),
         grade: childForm.grade.trim(),
-        photoUrl: childForm.photoUrl.trim(), 
+        photoUrl: (childForm.photoUrl || "").trim(),
+        photoData: childForm.photoData || "",
       };
 
       if (editingChildId) {
-       
         const updatedChild = await updateChildProfile(editingChildId, payload);
         const finalChild = updatedChild.child || updatedChild;
 
@@ -103,10 +113,8 @@ export default function SchoolNetwork() {
           })
         );
       } else {
-        
         const newChild = await createChildProfile(payload);
 
-        
         setFamilies((prev) =>
           prev.map((fam) => {
             if (fam.email === user.email) {
@@ -121,7 +129,6 @@ export default function SchoolNetwork() {
         );
       }
 
-      
       resetChildForm();
     } catch (err) {
       console.error(err);
@@ -131,16 +138,15 @@ export default function SchoolNetwork() {
     }
   };
 
-  // 🆕 Click "Edit" on a child
   const handleEditChildClick = (child) => {
     setEditingChildId(child._id);
     setChildForm({
       name: child.name || "",
       grade: child.grade || "",
+      photoData: child.photoData || "",
       photoUrl: child.photoUrl || "",
     });
   };
-
 
   const handleDeleteChild = async (childId) => {
     if (!window.confirm("Are you sure you want to delete this child profile?")) {
@@ -161,7 +167,6 @@ export default function SchoolNetwork() {
         })
       );
 
-      
       if (editingChildId === childId) {
         resetChildForm();
       }
@@ -198,8 +203,9 @@ export default function SchoolNetwork() {
     >
       <h3>School Connections</h3>
       <p style={{ fontSize: 13, color: "#666" }}>
-        These are families who share your school code ({user.schoolCode}). Each family
-        can create profiles for their children so other parents can recognize them.
+        These are families who share your school code ({user.schoolCode}). Each
+        family can create profiles for their children so other parents can
+        recognize them.
       </p>
 
       {error && (
@@ -217,7 +223,7 @@ export default function SchoolNetwork() {
         </div>
       )}
 
-      {/* Child profile form for the current family */}
+      {/* Child profile form */}
       <div
         style={{
           marginTop: 8,
@@ -229,10 +235,15 @@ export default function SchoolNetwork() {
         }}
       >
         <h4 style={{ margin: "0 0 6px" }}>
-          {editingChildId ? "Edit child profile" : "Add a child profile (your family)"}
+          {editingChildId
+            ? "Edit child profile"
+            : "Add a child profile (your family)"}
         </h4>
+
         <form onSubmit={handleChildSubmit} style={{ display: "grid", gap: 8 }}>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+          <div
+            style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}
+          >
             <div>
               <label style={labelStyle}>Child’s Name</label>
               <input
@@ -257,18 +268,46 @@ export default function SchoolNetwork() {
             </div>
           </div>
 
+          {/* Photo upload + optional URL */}
           <div>
-            <label style={labelStyle}>Photo URL</label>
+            <label style={labelStyle}>Child Photo</label>
             <input
-              name="photoUrl"
-              value={childForm.photoUrl}
-              onChange={handleChildChange}
-              style={inputStyle}
-              placeholder="Paste an image link (for now)"
+              type="file"
+              accept="image/*"
+              onChange={handleChildPhotoChange}
+              style={{ marginBottom: 4 }}
             />
-            <div style={{ fontSize: 11, color: "#777", marginTop: 2 }}>
-              (Later you can upgrade this to real image uploads. For now, a web image URL
-              or hosted link works.)
+            {childForm.photoData && (
+              <div style={{ marginTop: 4 }}>
+                <span style={{ fontSize: 11, color: "#777" }}>Preview:</span>
+                <img
+                  src={childForm.photoData}
+                  alt="Preview"
+                  style={{
+                    display: "block",
+                    marginTop: 4,
+                    width: 80,
+                    height: 80,
+                    objectFit: "cover",
+                    borderRadius: 8,
+                    border: "1px solid #ddd",
+                  }}
+                />
+              </div>
+            )}
+
+            <div style={{ marginTop: 8 }}>
+              <label style={labelStyle}>Or Photo URL</label>
+              <input
+                name="photoUrl"
+                value={childForm.photoUrl}
+                onChange={handleChildChange}
+                style={inputStyle}
+                placeholder="Paste an image link (optional)"
+              />
+              <div style={{ fontSize: 11, color: "#777", marginTop: 2 }}>
+                You can either upload a photo from your device or paste a URL.
+              </div>
             </div>
           </div>
 
@@ -368,7 +407,8 @@ export default function SchoolNetwork() {
                   <div
                     style={{
                       display: "grid",
-                      gridTemplateColumns: "repeat(auto-fill, minmax(90px, 1fr))",
+                      gridTemplateColumns:
+                        "repeat(auto-fill, minmax(90px, 1fr))",
                       gap: 8,
                     }}
                   >
@@ -383,7 +423,19 @@ export default function SchoolNetwork() {
                           textAlign: "center",
                         }}
                       >
-                        {child.photoUrl ? (
+                        {child.photoData ? (
+                          <img
+                            src={child.photoData}
+                            alt={child.name}
+                            style={{
+                              width: "100%",
+                              height: 70,
+                              objectFit: "cover",
+                              borderRadius: 6,
+                              marginBottom: 4,
+                            }}
+                          />
+                        ) : child.photoUrl ? (
                           <img
                             src={child.photoUrl}
                             alt={child.name}
@@ -413,6 +465,7 @@ export default function SchoolNetwork() {
                             No photo
                           </div>
                         )}
+
                         <div style={{ fontWeight: "bold", fontSize: 12 }}>
                           {child.name}
                         </div>
@@ -420,7 +473,6 @@ export default function SchoolNetwork() {
                           {child.grade}
                         </div>
 
-                        {/* 🆕 Only show edit/delete for THIS parent's kids */}
                         {isCurrentFamily && child._id && (
                           <div
                             style={{

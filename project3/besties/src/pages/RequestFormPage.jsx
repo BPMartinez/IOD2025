@@ -1,13 +1,14 @@
 
 import React, { useState } from "react";
-import { Navigate } from "react-router-dom";
+import { Navigate, Link, useNavigate } from "react-router-dom";
 import { getCurrentUser, createRequest } from "../api/client";
 
 export default function RequestFormPage() {
   const user = getCurrentUser();
+  const navigate = useNavigate();
+
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
-
 
   const [form, setForm] = useState({
     toEmail: "",
@@ -21,9 +22,13 @@ export default function RequestFormPage() {
     notes: "",
   });
 
-  if (!user) {
-    return <Navigate to="/auth" replace />;
-  }
+  if (!user) return <Navigate to="/auth" replace />;
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    navigate("/auth");
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -36,15 +41,10 @@ export default function RequestFormPage() {
     setSubmitting(true);
 
     try {
-      const payload = {
-        ...form,
-        purpose: form.purpose,
-      };
+      await createRequest({ ...form });
 
-      await createRequest(payload);
+      alert("Request sent! You can see it in 'Hangouts'.");
 
-      alert("Request sent! You can see it in 'My Requests'.");
-      // reset
       setForm({
         toEmail: "",
         childName: "",
@@ -66,6 +66,23 @@ export default function RequestFormPage() {
 
   return (
     <div style={{ maxWidth: 600, margin: "30px auto", padding: "0 16px" }}>
+      
+      {/* ⭐ TOP BUTTON GROUP — SAME AS MyRequestsPage */}
+      <div
+        style={{
+          display: "flex",
+          gap: 8,
+          justifyContent: "flex-end",
+          marginBottom: 16,
+          flexWrap: "wrap",
+        }}
+      >
+        <Link to="/home" style={linkBtn}>Home</Link>
+        <Link to="/requests" style={linkBtn}>Hangouts</Link>
+        <Link to="/incoming" style={linkBtn}>Requests To Me</Link>
+        <button onClick={handleLogout} style={logoutBtn}>Log Out</button>
+      </div>
+
       <h2>Create a Playdate / Carpool Request</h2>
       <p style={{ fontSize: 14, color: "#555" }}>
         This form sends a real request through your Node / Express / MongoDB backend.
@@ -98,12 +115,7 @@ export default function RequestFormPage() {
         />
 
         <Label>Your Child’s Name</Label>
-        <Input
-          name="childName"
-          value={form.childName}
-          onChange={handleChange}
-          required
-        />
+        <Input name="childName" value={form.childName} onChange={handleChange} required />
 
         <Label>Your Name</Label>
         <Input
@@ -143,20 +155,10 @@ export default function RequestFormPage() {
         </select>
 
         <Label>Date</Label>
-        <Input
-          type="date"
-          name="date"
-          value={form.date}
-          onChange={handleChange}
-        />
+        <Input type="date" name="date" value={form.date} onChange={handleChange} />
 
         <Label>Time</Label>
-        <Input
-          type="time"
-          name="time"
-          value={form.time}
-          onChange={handleChange}
-        />
+        <Input type="time" name="time" value={form.time} onChange={handleChange} />
 
         <Label>Notes</Label>
         <textarea
@@ -175,9 +177,18 @@ export default function RequestFormPage() {
   );
 }
 
+/* --------------------------- Components --------------------------- */
+
 function Label({ children }) {
   return (
-    <label style={{ display: "block", marginTop: 10, fontWeight: "bold", fontSize: 14 }}>
+    <label
+      style={{
+        display: "block",
+        marginTop: 10,
+        fontWeight: "bold",
+        fontSize: 14,
+      }}
+    >
       {children}
     </label>
   );
@@ -194,6 +205,8 @@ function Input(props) {
     />
   );
 }
+
+/* --------------------------- Styles --------------------------- */
 
 const inputStyle = {
   width: "100%",
@@ -215,4 +228,25 @@ const buttonStyle = {
   color: "white",
   fontSize: 15,
   cursor: "pointer",
+};
+
+/* ⭐ Same button styles used across multiple pages */
+const linkBtn = {
+  padding: "6px 10px",
+  borderRadius: 6,
+  background: "#f7b6cd",
+  color: "#fff",
+  textDecoration: "none",
+  fontSize: 13,
+  fontWeight: 600,
+  border: "none",
+  display: "inline-block",
+  cursor: "pointer",
+};
+
+const logoutBtn = {
+  ...linkBtn,
+  background: "#fff",
+  color: "#f7b6cd",
+  border: "1px solid #f7b6cd",
 };

@@ -1,7 +1,7 @@
 body {
   margin: 0;
-  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
-  background: #f7f7f7;
+  font-family: system-ui, "Segoe UI", sans-serif;
+ background: #fde6ef;
 }
 
 /* Navbar */
@@ -10,7 +10,7 @@ body {
   justify-content: space-between;
   align-items: center;
   background: #ff8ab5;
-  color: #fff;
+  color: #ffffff;
   padding: 10px 16px;
 }
 
@@ -29,7 +29,7 @@ body {
 
 .nav-link {
   text-decoration: none;
-  color: #fff;
+  color: #ff89cc;
   font-size: 14px;
 }
 
